@@ -7,6 +7,7 @@ EXPOSE 80
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
 COPY ["MyFirstDockerApp/MyFirstDockerApp.csproj", "MyFirstDockerApp/"]
+RUN ls -la
 RUN dotnet restore "MyFirstDockerApp/MyFirstDockerApp.csproj"
 COPY . .
 WORKDIR "/src/MyFirstDockerApp"
