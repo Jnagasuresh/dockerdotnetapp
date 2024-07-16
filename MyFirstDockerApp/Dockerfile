@@ -6,17 +6,34 @@ EXPOSE 80
 
 FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
 WORKDIR /src
-COPY ["MyFirstDockerApp/MyFirstDockerApp.csproj", "MyFirstDockerApp/"]
-RUN ls -la
-RUN dotnet restore "MyFirstDockerApp/MyFirstDockerApp.csproj"
-COPY . .
-WORKDIR "/src/MyFirstDockerApp"
-RUN dotnet build "MyFirstDockerApp.csproj" -c Release -o /app/build
+COPY *csproj ./
+RUN dotnet restore
+COPY . ./
 
-FROM build AS publish
-RUN dotnet publish "MyFirstDockerApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+RUN dotnet publish -c Release -o out
 
-FROM base AS final
+FROM mcr.microsoft.com/dotnet/aspnet:7.0 as runtime
 WORKDIR /app
-COPY --from=publish /app/publish .
+COPY --from=build /app/put ./
+
+EXPOSE 80
+
 ENTRYPOINT ["dotnet", "MyFirstDockerApp.dll"]
+
+#
+#FROM mcr.microsoft.com/dotnet/sdk:7.0 AS build
+#WORKDIR /src
+#COPY ["MyFirstDockerApp/MyFirstDockerApp.csproj", "MyFirstDockerApp/"]
+#RUN ls -la
+#RUN dotnet restore "MyFirstDockerApp/MyFirstDockerApp.csproj"
+#COPY . .
+#WORKDIR "/src/MyFirstDockerApp"
+#RUN dotnet build "MyFirstDockerApp.csproj" -c Release -o /app/build
+#
+#FROM build AS publish
+#RUN dotnet publish "MyFirstDockerApp.csproj" -c Release -o /app/publish /p:UseAppHost=false
+#
+#FROM base AS final
+#WORKDIR /app
+#COPY --from=publish /app/publish .
+#ENTRYPOINT ["dotnet", "MyFirstDockerApp.dll"]
